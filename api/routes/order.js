@@ -1,179 +1,69 @@
-import { verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyToken } from "../verifyToken.js";
-import Product from "../models/Product.js";
-import asyncHandler from "express-async-handler";
-import router from "express";
+import express from 'express';
+import Order from '../models/Order.js';
+import { verifyTokenAndAuthorization, verifyTokenAndAdmin } from '../verifyToken.js';
 
-// CREATE
-router.post("/", verifyTokenAndAdmin, async (req, res) => {
-    const newProduct = new Product(req.body);
+const router = express.Router();
+
+// GET all orders
+router.get("/", verifyTokenAndAdmin, async (req, res) => {
     try {
-        const savedProduct = await newProduct.save();
-        res.status(200).json(savedProduct);
+        const orders = await Order.find();
+        res.status(200).json(orders);
     } catch (err) {
         res.status(500).json(err);
     }
 });
 
-// UPDATE
+// UPDATE order
 router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(
+        const updatedOrder = await Order.findByIdAndUpdate(
             req.params.id,
-            {
-            $set: req.body,
-            },
+            { $set: req.body },
             { new: true }
         );
-        res.status(200).json(updatedProduct);
+        res.status(200).json(updatedOrder);
     } catch (err) {
         res.status(500).json(err);
     }
 });
 
-// DELETE
+// DELETE order
 router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
     try {
-        await Product.findByIdAndDelete(req.params.id);
-        res.status(200).json("Product has been deleted...");
+        await Order.findByIdAndDelete(req.params.id);
+        res.status(200).json("Order has been deleted...");
     } catch (err) {
         res.status(500).json(err);
     }
 });
 
-// GET PRODUCT
-router.get("/find/:id", async (req, res) => {
+// GET USER ORDERS
+router.get("/find/:userId", verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
-        res.status(200).json(product);
+        const orders = await Order.find({ userId: req.params.userId });
+        res.status(200).json(orders);
     } catch (err) {
         res.status(500).json(err);
     }
-    
 });
 
-// GET ALL PRODUCTS
-router.get("/", async (req, res) => {
-    const qNew = req.query.new;
-    const qCategory = req.query.category;
+// GET MONTHLY INCOME
+router.get("/income", verifyTokenAndAdmin, async (req, res) => {
+    const productId = req.query.pid;
+    const date = new Date();
+    const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
+    const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
     try {
-        let products;
-
-        if (qNew) {
-            products = await Product.find().sort({ createdAt: -1 }).limit(5);
-        } else if (qCategory) {
-            products = await Product.find({
-                categories: {
-                    $in: [qCategory],
-                },
-            });
-        } else {
-            products = await Product.find();
-        }
-
-        res.status(200).json(products);
+        const income = await Order.aggregate([
+            { $match: { createdAt: { $gte: previousMonth }, ...(productId && { products: { $elemMatch: { productId } } }) } },
+            { $project: { month: { $month: "$createdAt" }, sales: "$amount" } },
+            { $group: { _id: "$month", total: { $sum: "$sales" } } }
+        ]);
+        res.status(200).json(income);
     } catch (err) {
         res.status(500).json(err);
     }
-}); 
+});
 
 export default router;
-
-
-
-
-// import router from "express";
-// import Order from "../models/Order.js";
-// import { verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyToken  } from "../verifyToken.js";
-// import asyncHandler from "express-async-handler";
-// import Product from "../models/Product.js";
-
-
-// // GET
-// router.get("/", verifyTokenAndAdmin, async (req, res) => {
-//     try {
-//         const orders = await Order.find();
-//         res.status(200).json(orders);
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// });
-
-// //  update
-// router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
-//     try {
-//         const updatedOrder = await Order.findByIdAndUpdate(
-//             req.params.id,
-//             {
-//             $set: req.body,
-//             },
-//             { new: true }
-//         );
-//         res.status(200).json(updatedOrder);
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// });
-
-
-// // DELETE
-// router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
-//     try {
-//         await Order.findByIdAndDelete(req.params.id);
-//         res.status(200).json("Order has been deleted...");
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// });
-
-// // GET USER ORDERS
-// router.get("/find/:userId", verifyTokenAndAuthorization, async (req, res) => {
-//     try {
-//         const orders = await Order.find({ userId: req.params.userId });
-//         res.status(200).json(orders);
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// });
-
-
-// // GET MONTHLY INCOME
-// router.get("/income", verifyTokenAndAdmin, async (req, res) => {
-//     const productId = req.query.pid;
-//     const date = new Date();
-//     const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
-//     const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
-
-//     try {
-//         const income = await Order.aggregate([
-//             {
-//                 $match: {
-//                     createdAt: { $gte: previousMonth },
-//                     ...(productId && {
-//                         products: { $elemMatch: { productId } },
-//                     }),
-//                 },
-//             },
-//             {   
-//                 $project: { 
-//                     month: { $month: "$createdAt" },
-//                     sales: "$amount",
-//                 },
-//             },
-//             {
-//                 $group: {
-//                     _id: "$month",
-//                     total: { $sum: "$sales" },
-//                 },
-//             },
-//         ]);
-//         res.status(200).json(income);
-//     } catch (err) {
-//         res.status(500).json(err);
-//     }
-// });
-
-// export default router;
-
-
-
-

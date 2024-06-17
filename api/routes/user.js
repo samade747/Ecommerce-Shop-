@@ -1,51 +1,38 @@
-import router from "express";
+import express from 'express';
 import User from '../models/User.js';
-import CryptoJS from "crypto-js";
-import { verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyToken } from "../verifyToken.js";
+import CryptoJS from 'crypto-js';
+import { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin } from '../verifyToken.js';
 
-router.put("/:id", verifyToken, async (req, res) => {
-    if (req.user.id === req.params.id || req.user.isAdmin) {
-        if (req.body.password) {
-            req.body.password = CryptoJS.AES.encrypt(
-                req.body.password,
-                process.env.PASS_SEC
-            ).toString();
-        }
-        try {
-            const updatedUser = await User.findByIdAndUpdate(
-                req.params.id,
-                {
-                $set: req.body,
-                },
-                { new: true }
-            );
-            res.status(200).json(updatedUser);
-        } catch (err) {
-            res.status(500).json(err);
-        }
-        next();
-    } else {
-        return res.status(403).json("You are not allowed!");
-    }   
-});
+const router = express.Router();
 
-
-
-// DELETE
-router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
-    if (req.user.id === req.params.id || req.user.isAdmin) {
-        try {
-            await User.findByIdAndDelete(req.params.id);
-            res.status(200).json("User has been deleted...");
-        } catch (err) {
-            res.status(500).json(err);
-        }
-    } else {
-        return res.status(403).json("You are not allowed!");
+// UPDATE
+router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
+    if (req.body.password) {
+        req.body.password = CryptoJS.AES.encrypt(req.body.password, process.env.PASS_SEC).toString();
+    }
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },
+            { new: true }
+        );
+        res.status(200).json(updatedUser);
+    } catch (err) {
+        res.status(500).json(err);
     }
 });
 
-// GET user
+// DELETE
+router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.status(200).json("User has been deleted...");
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+// GET USER
 router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -56,46 +43,31 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
     }
 });
 
-// GET all user
+// GET ALL USERS
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
     const query = req.query.new;
     try {
-        const users = query ? await User.find().sort({_id: -1}).limit(5) : await User.findById();
+        const users = query ? await User.find().sort({ _id: -1 }).limit(5) : await User.find();
         res.status(200).json(users);
-    } catch (err) { 
+    } catch (err) {
         res.status(500).json(err);
     }
 });
 
-
-// GET user stats
+// GET USER STATS
 router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
     const date = new Date();
     const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
-
     try {
         const data = await User.aggregate([
             { $match: { createdAt: { $gte: lastYear } } },
-            {
-                $project: {
-                    month: { $month: "$createdAt" },
-                },
-            },
-            {
-                $group: {
-                    _id: "$month",
-                    total: { $sum: 1 },
-                },
-            },
+            { $project: { month: { $month: "$createdAt" } } },
+            { $group: { _id: "$month", total: { $sum: 1 } } },
         ]);
-        res.status(200).json(data)
-
+        res.status(200).json(data);
     } catch (err) {
         res.status(500).json(err);
-    }   
+    }
 });
 
-
-export default router
-    
-        
+export default router;
