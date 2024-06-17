@@ -1,6 +1,6 @@
 import router from "express";
 import Cart from "../models/Cart.js";
-import { verifyTokenAndAuthorization, verifyTokenAndAdmin } from "../verifyToken.js";
+import { verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyToken } from "../verifyToken.js";
 
 // CREATE
 

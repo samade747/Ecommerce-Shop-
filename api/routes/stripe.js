@@ -1,6 +1,6 @@
 import router from "express";
 import Stripe from "stripe";
-import { verifyTokenAndAuthorization, verifyTokenAndAdmin } from "../verifyToken.js";
+import { verifyTokenAndAuthorization, verifyTokenAndAdmin, verifyToken } from "../verifyToken.js";
 import Order from "../models/Order.js";
 
 const stripe = new Stripe(process.env.STRIPE_KEY);
