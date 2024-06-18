@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar'
 import Announcement from '../components/Announcement'
 import { Add, Remove } from '@mui/icons-material'
 import { mobile } from '../responsive'
-
+import 
 
 
 
@@ -161,6 +161,8 @@ const Button = styled.button`
 
 
 const Product = () => {
+  const location = useLocation();
+  const id = location.pathname.split("/")[2];
   return (
     <Container>
       <Navbar />
