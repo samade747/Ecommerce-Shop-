@@ -7,48 +7,26 @@ import Login from './pages/Login.jsx';
 import Cart from './pages/Cart.jsx';
 import {
   BrowserRouter as Router,
-  Switch,
   Routes,
   Route,
-  Link
+  Navigate,
 } from "react-router-dom";
 
-
 const App = () => {
+  const user = true;
+
   return (
     <Router>
-      <Switch>
-
-        <Route exact path="/">
-          <Home />
-        </Route>
-
-        <Route path="/products/:category">
-          <ProductList />
-        </Route>
-
-        <Route path="/product/:id">
-          <Product />
-        </Route>
-
-        <Route path="/cart">
-          <Cart />
-        </Route>
-
-        <Route path="/login">
-          <Login />
-        </Route>
-
-        <Route path="/register">
-          <Register />
-        </Route>
-
-      </Switch>
-
+      <Routes>
+        <Route exact path="/" element={<Home />} />
+        <Route path="/products/:category" element={<ProductList />} />
+        <Route path="/product/:id" element={<Product />} />
+        <Route path="/cart" element={user ? <Cart /> : <Navigate to="/" />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+      </Routes>
     </Router>
-
-  )
-  
+  );
 };
 
 export default App;

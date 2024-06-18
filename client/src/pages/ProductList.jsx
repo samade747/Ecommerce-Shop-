@@ -61,6 +61,10 @@ const Option = styled.option`
 
 
 const ProductList = () => {
+  const location = useLocation();
+  const category = location.pathname.split("/")[2];
+
+  
   return (
       <Container>
         <Navbar />
