@@ -4,6 +4,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import styled from 'styled-components';
 import { mobile } from '../responsive';
+import products from '../data';
+import { SliderItems, popularProducts, categories, products } from '/src/data.jsx';
+
 
 const Container = styled.div`
 
@@ -225,30 +228,13 @@ const Remove = styled.div`
 `;
 
 const Cart = () => {
-  const products = [
-    {
-      id: 1,
-      name: 'JESSIE THUNDER SHOES',
-      image: 'https://i.ibb.co/DG69bQ4/2.png',  
-      price: 160.0,
-      size: '37.5',
-      color: 'black',
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: 'WOMENS THUNDER SHOES',
-      image: 'https://i.ibb.co/cXFnLLV/3.png',
-      price: 160.0,
-      size: '37.5',
-      color: 'black',
-      quantity: 1,
-    },
-  ];
 
+  const cart = useSelector((state) => state.cart);
+  const { quantity } = cart;
+ 
   const subtotal = products.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  return (
+  return (   
     <Container>
       <Navbar />
       <Announcement />
@@ -299,7 +285,7 @@ const Cart = () => {
               <SummaryItemPrice>$ {subtotal.toFixed(2)}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
-              <SummaryItemText>Shipping</SummaryItemText>
+              <SummaryItemText> Estimated Shipping</SummaryItemText>
               <SummaryItemPrice>Free</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem type="total">

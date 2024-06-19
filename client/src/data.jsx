@@ -92,3 +92,24 @@ export const SliderItems = [
 
   ];
   
+
+  export const products = [
+    {
+      id: 1,
+      name: 'JESSIE THUNDER SHOES',
+      image: 'https://i.ibb.co/DG69bQ4/2.png',  
+      price: 160.0,
+      size: '37.5',
+      color: 'black',
+      quantity: 1,
+    },
+    {
+      id: 2,
+      name: 'WOMENS THUNDER SHOES',
+      image: 'https://i.ibb.co/cXFnLLV/3.png',
+      price: 160.0,
+      size: '37.5',
+      color: 'black',
+      quantity: 1,
+    },
+  ];
