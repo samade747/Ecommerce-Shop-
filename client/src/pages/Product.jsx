@@ -10,6 +10,8 @@ import { mobile } from '../responsive'
 import { useLocation } from 'react-router-dom'
 import { publicRequest } from '../requestMethods'
 import axios from 'axios'
+import { addProduct } from '../redux/cartRedux'
+import { useDispatch } from 'react-redux'
 
 
 
@@ -168,6 +170,7 @@ const Product = () => {
   const [quantity, setQuantity] = useState(1);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState("");
+  const dispatch = useDispatch();
 
 
 
@@ -194,10 +197,13 @@ const Product = () => {
 
 
   const handleClick = () => {
-    axios.post("/cart", {
+    dispatch(
+      addProduct({...product, quantity, colors, sizes, price: product.price*quantity})
+    );
+    
       
-    })
-  }
+    }
+  
 
 
   return (

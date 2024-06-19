@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { Badge } from '@mui/material';
-
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { mobile } from '../responsive.jsx';
 
 
@@ -90,6 +91,12 @@ const MenuItem = styled.div`
 `;
 
 const Navbar = () => {
+
+  const cart = useSelector((state) => state.cart);
+  const { quantity } = cart;
+
+  const dispatch = useDispatch();
+
   return (
     <Container>
       <Wrapper>
@@ -108,7 +115,7 @@ const Navbar = () => {
             <SearchInput placeholder="Search" />
           </SearchContainer>
           <MenuItem>
-            <Badge badgeContent={4} color="primary">
+            <Badge badgeContent={quantity} color="primary">
               <ShoppingCartCheckoutIcon />
             </Badge>
           </MenuItem>
