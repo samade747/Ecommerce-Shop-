@@ -4,8 +4,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import styled from 'styled-components';
 import { mobile } from '../responsive';
-import products from '../data';
-import { SliderItems, popularProducts, categories, products } from '/src/data.jsx';
+
+import { SliderItems, popularProducts, categories, products } from '../data.jsx';
 
 
 const Container = styled.div`

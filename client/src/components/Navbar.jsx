@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { Badge } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+
+import { useDispatch, useSelector } from 'react-redux';
 import { mobile } from '../responsive.jsx';
+import { Link } from 'react-router-dom';
+
+
 
 
 const Container = styled.div`
