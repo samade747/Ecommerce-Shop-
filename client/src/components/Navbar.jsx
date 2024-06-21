@@ -106,10 +106,9 @@ const Navbar = () => {
           <Logo>Shopping</Logo>
         </Left>
         <Center>
-          <MenuItem>HOME</MenuItem>
-          <MenuItem>PRODUCTS</MenuItem>
-          <MenuItem>ABOUT</MenuItem>
-          <MenuItem>CONTACT</MenuItem>
+          <MenuItem>Register</MenuItem>
+          <MenuItem>Sign In</MenuItem>
+         <Link to="/cart"><MenuItem>Cart</MenuItem></Link>
         </Center>
         <Right>
           <SearchContainer>
