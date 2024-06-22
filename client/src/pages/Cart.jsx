@@ -4,8 +4,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import styled from 'styled-components';
 import { mobile } from '../responsive';
-
+import StripeCheckout from "react-stripe-checkout";
 import { SliderItems, popularProducts, categories, products } from '../data.jsx';
+
+const KEY = process.env.REACT_APP_STRIPE
 
 
 const Container = styled.div`
@@ -230,7 +232,13 @@ const Remove = styled.div`
 const Cart = () => {
 
   const cart = useSelector((state) => state.cart);
-  const { quantity } = cart;
+  const products = cart.products;
+  const [stripeToken, setStripeToken] = useState(null);
+
+ 
+  const onToken = (token) => {
+    setStripeToken(token);
+  };
  
   const subtotal = products.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -250,7 +258,7 @@ const Cart = () => {
         </Top>
         <Bottom>
           <Info>
-            {products.map((product) => (
+            {cart.map((product) => (
               <Product key={product.id}>
                 <ProductDetail>
                   <Image src={product.image} />
@@ -271,11 +279,13 @@ const Cart = () => {
                   <ProductAmountContainer>
                     <ProductAmount>{product.quantity}</ProductAmount>
                   </ProductAmountContainer>
-                  <ProductPrice>$ {product.price}</ProductPrice>
+                  <ProductPrice>$ {product.price*product.quantity}</ProductPrice>
                 </PriceDetail>
                 <Remove>X</Remove>
               </Product>
             ))}
+
+
             <Hr />
           </Info>
           <Summary>
@@ -292,6 +302,28 @@ const Cart = () => {
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>$ {subtotal.toFixed(2)}</SummaryItemPrice>
             </SummaryItem>
+              <StripeCheckout>
+                name = {user.name}
+                image = {user.img}
+                billingAddress = {user.address}
+                ShippingAddress = {user.address}
+                description = {`Your total is $${subtotal.toFixed(2)}`}
+                email = {user.email}
+                products = {products}
+                token = {stripeToken.id}
+                total = {subtotal.toFixed(2)}
+                stripeKey = {process.env.STRIPE_KEY}
+                
+
+
+
+
+              </StripeCheckout>
+
+
+
+
+            <Button>CHECKOUT NOW</Button>
           </Summary>
         </Bottom>
       </Wrapper>
