@@ -6,6 +6,12 @@ import styled from 'styled-components';
 import { mobile } from '../responsive';
 import StripeCheckout from "react-stripe-checkout";
 import { SliderItems, popularProducts, categories, products } from '../data.jsx';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { addProduct } from '../redux/cartRedux';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { userRequest } from '../requestMethods';
 
 const KEY = process.env.REACT_APP_STRIPE
 
@@ -234,14 +240,28 @@ const Cart = () => {
   const cart = useSelector((state) => state.cart);
   const products = cart.products;
   const [stripeToken, setStripeToken] = useState(null);
-
+  const history = useHistory();
+  const subtotal = products.reduce((acc, item) => acc + item.price * item.quantity, 0);
  
   const onToken = (token) => {
     setStripeToken(token);
   };
- 
-  const subtotal = products.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+
+  useEffect(() => {
+    const makeRequest = async () => {
+      try {
+        const res = await userRequest.post("/checkout/payment", {
+          tokenId: stripeToken.id,
+          amount: cart.total * 100,
+          
+        });
+        history.push(history.push("/success", {data: res.data }));
+        console.log(res.data);
+      } catch {}
+    };
+    stripeToken && makeRequest()
+    }, [stripeToken, cart.total, history]);
   return (   
     <Container>
       <Navbar />
@@ -312,12 +332,7 @@ const Cart = () => {
                 products = {products}
                 token = {stripeToken.id}
                 total = {subtotal.toFixed(2)}
-                stripeKey = {process.env.STRIPE_KEY}
-                
-
-
-
-
+                stripeKey = {process.env.STRIPE_KEY}     
               </StripeCheckout>
 
 
@@ -330,7 +345,7 @@ const Cart = () => {
       <Footer />
     </Container>
   );
-};
+}
 
 export default Cart;
 
